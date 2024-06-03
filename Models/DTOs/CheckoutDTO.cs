@@ -7,6 +7,6 @@ public class CheckoutDTO
     public int PatronId { get; set; }
     public DateTime CheckoutDate { get; set; }
     public DateTime? ReturnDate { get; set; }
-    public Material? MaterialType { get; set; }
-    public Patron? Patron { get; set; }
+    public MaterialDTO Material { get; set; }
+    public PatronDTO Patron { get; set; }
 }

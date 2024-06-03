@@ -7,5 +7,7 @@ public class MaterialDTO
     public int MaterialTypeId { get; set; }
     public int GenreId { get; set; }
     public DateTime? OutOfCirculation { get; set; }
-    public MaterialType? MaterialType { get; set; }
+    public MaterialTypeDTO MaterialType { get; set; }
+    public GenreDTO Genre { get; set; }
+    public List<CheckoutDTO> Checkouts { get; set; }
 }

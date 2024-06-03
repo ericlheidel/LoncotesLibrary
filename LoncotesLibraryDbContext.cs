@@ -15,6 +15,33 @@ public class LoncotesLibraryDbContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Checkout>().HasData(new Checkout[]
+        {
+            new Checkout
+            {
+                Id = 1,
+                MaterialId = 4,
+                PatronId = 1,
+                CheckoutDate = new DateTime(2024,01,01),
+                ReturnDate = new DateTime(2024,01,31)
+            },
+            new Checkout
+            {
+                Id = 2,
+                MaterialId = 5,
+                PatronId = 2,
+                CheckoutDate = new DateTime(2024,02,02),
+                ReturnDate = new DateTime(2024,02,28)
+            },
+            new Checkout
+            {
+                Id = 3,
+                MaterialId = 6,
+                PatronId = 1,
+                CheckoutDate = new DateTime(2024,03,03),
+                ReturnDate = new DateTime(2024,06,30)
+            },
+        });
         modelBuilder.Entity<Genre>().HasData(new Genre[]
         {
             new Genre {Id = 1, Name = "Horror"},
