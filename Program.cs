@@ -27,7 +27,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/materials", (LoncotesLibraryDbContext db, int? materialTypeId, int? genreId) =>
+app.MapGet("/api/materials", (LoncotesLibraryDbContext db, int? materialTypeId, int? genreId) =>
 {
     return db.Materials
         .Include(m => m.Genre)
@@ -58,7 +58,7 @@ app.MapGet("/materials", (LoncotesLibraryDbContext db, int? materialTypeId, int?
         .ToList();
 });
 
-app.MapGet("/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
+app.MapGet("/api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
 {
     try
     {
@@ -112,7 +112,7 @@ app.MapGet("/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
     }
 });
 
-app.MapGet("/materialtypes", (LoncotesLibraryDbContext db) =>
+app.MapGet("/api/materialtypes", (LoncotesLibraryDbContext db) =>
 {
     return db.MaterialTypes.Select(mt => new MaterialTypeDTO
     {
@@ -122,7 +122,7 @@ app.MapGet("/materialtypes", (LoncotesLibraryDbContext db) =>
     }).ToList();
 });
 
-app.MapGet("/genres", (LoncotesLibraryDbContext db) =>
+app.MapGet("/api/genres", (LoncotesLibraryDbContext db) =>
 {
     return db.Genres.Select(g => new GenreDTO
     {
@@ -131,7 +131,7 @@ app.MapGet("/genres", (LoncotesLibraryDbContext db) =>
     }).ToList();
 });
 
-app.MapGet("/patrons", (LoncotesLibraryDbContext db) =>
+app.MapGet("/api/patrons", (LoncotesLibraryDbContext db) =>
 {
     return db.Patrons.Select(p => new PatronDTO
     {
@@ -144,7 +144,7 @@ app.MapGet("/patrons", (LoncotesLibraryDbContext db) =>
     }).ToList();
 });
 
-app.MapGet("/patrons/{id}", (LoncotesLibraryDbContext db, int id) =>
+app.MapGet("/api/patrons/{id}", (LoncotesLibraryDbContext db, int id) =>
 {
     return db.Patrons  // rr TIER 1
         .Include(p => p.Checkouts)  // gg TIER 2
@@ -201,7 +201,7 @@ app.MapGet("/patrons/{id}", (LoncotesLibraryDbContext db, int id) =>
                 .Single();
 });
 
-app.MapGet("/materials/available", (LoncotesLibraryDbContext db) =>
+app.MapGet("/api/materials/available", (LoncotesLibraryDbContext db) =>
 {
     return db.Materials
     .Where(m => m.OutOfCirculation == null)
@@ -217,7 +217,7 @@ app.MapGet("/materials/available", (LoncotesLibraryDbContext db) =>
     .ToList();
 });
 
-app.MapGet("/checkouts/overdue", (LoncotesLibraryDbContext db) =>
+app.MapGet("/api/checkouts/overdue", (LoncotesLibraryDbContext db) =>
 {
     return db.Checkouts
     .Include(p => p.Patron)
@@ -261,14 +261,14 @@ app.MapGet("/checkouts/overdue", (LoncotesLibraryDbContext db) =>
     .ToList();
 });
 
-app.MapPost("/materials", (LoncotesLibraryDbContext db, Material material) =>
+app.MapPost("/api/materials", (LoncotesLibraryDbContext db, Material material) =>
 {
     db.Materials.Add(material);
     db.SaveChanges();
     return Results.Created($"/materials/{material.Id}", material);
 });
 
-app.MapPost("/checkouts", (LoncotesLibraryDbContext db, Checkout c) =>
+app.MapPost("/api/checkouts", (LoncotesLibraryDbContext db, Checkout c) =>
 {
     c.CheckoutDate = DateTime.Now;
     c.ReturnDate = null;
@@ -279,7 +279,7 @@ app.MapPost("/checkouts", (LoncotesLibraryDbContext db, Checkout c) =>
     return Results.NoContent();
 });
 
-app.MapPut("/materials/{id}", (LoncotesLibraryDbContext db, int id, Material m) =>
+app.MapPut("/api/materials/{id}", (LoncotesLibraryDbContext db, int id, Material m) =>
 {
     Material materialToUpdate = db.Materials.SingleOrDefault(m => m.Id == id);
     if (materialToUpdate == null)
@@ -294,7 +294,7 @@ app.MapPut("/materials/{id}", (LoncotesLibraryDbContext db, int id, Material m) 
     return Results.NoContent();
 });
 
-app.MapPut("/patrons/{id}", (LoncotesLibraryDbContext db, int id, Patron p) =>
+app.MapPut("/api/patrons/{id}", (LoncotesLibraryDbContext db, int id, Patron p) =>
 {
     Patron patronToUpdate = db.Patrons.SingleOrDefault(p => p.Id == id);
 
@@ -311,7 +311,7 @@ app.MapPut("/patrons/{id}", (LoncotesLibraryDbContext db, int id, Patron p) =>
     return Results.NoContent();
 });
 
-app.MapPut("/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id, Patron p) =>
+app.MapPut("/api/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id, Patron p) =>
 {
     Patron patronToDeactivate = db.Patrons.SingleOrDefault(p => p.Id == id);
 
@@ -327,7 +327,7 @@ app.MapPut("/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id, Pat
     return Results.NoContent();
 });
 
-app.MapPost("/checkouts/materialId={materialId}/return", (LoncotesLibraryDbContext db, int materialId) =>
+app.MapPost("/api/checkouts/materialId={materialId}/return", (LoncotesLibraryDbContext db, int materialId) =>
 {
     Checkout checkoutToReturn = db.Checkouts.SingleOrDefault(c => c.MaterialId == materialId);
 

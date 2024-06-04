@@ -59,7 +59,7 @@ public class LoncotesLibraryDbContext : DbContext
                 LastName = "Kelly",
                 Address = "111 Broadway",
                 Email = "charlie@kelly.com",
-                IsActive = false
+                IsActive = true
             },
             new Patron
             {
@@ -68,7 +68,7 @@ public class LoncotesLibraryDbContext : DbContext
                 LastName = "Reynolds",
                 Address = "222 Broadway",
                 Email = "frank@reynolds.com",
-                IsActive = false
+                IsActive = true
             },
             new Patron
             {
