@@ -56,7 +56,7 @@ namespace LoncotesLibrary.Migrations
                             CheckoutDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             MaterialId = 4,
                             PatronId = 1,
-                            ReturnDate = new DateTime(2024, 1, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            ReturnDate = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -71,8 +71,7 @@ namespace LoncotesLibrary.Migrations
                             Id = 3,
                             CheckoutDate = new DateTime(2024, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             MaterialId = 6,
-                            PatronId = 1,
-                            ReturnDate = new DateTime(2024, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            PatronId = 1
                         });
                 });
 
@@ -303,7 +302,7 @@ namespace LoncotesLibrary.Migrations
                             Address = "111 Broadway",
                             Email = "charlie@kelly.com",
                             FirstName = "Charlie",
-                            IsActive = true,
+                            IsActive = false,
                             LastName = "Kelly"
                         },
                         new
@@ -312,7 +311,7 @@ namespace LoncotesLibrary.Migrations
                             Address = "222 Broadway",
                             Email = "frank@reynolds.com",
                             FirstName = "Frank",
-                            IsActive = true,
+                            IsActive = false,
                             LastName = "Reynolds"
                         },
                         new
@@ -328,19 +327,19 @@ namespace LoncotesLibrary.Migrations
 
             modelBuilder.Entity("LoncotesLibrary.Models.Checkout", b =>
                 {
-                    b.HasOne("LoncotesLibrary.Models.Material", "MaterialType")
+                    b.HasOne("LoncotesLibrary.Models.Material", "Material")
                         .WithMany("Checkouts")
                         .HasForeignKey("MaterialId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LoncotesLibrary.Models.Patron", "Patron")
-                        .WithMany()
+                        .WithMany("Checkouts")
                         .HasForeignKey("PatronId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("MaterialType");
+                    b.Navigation("Material");
 
                     b.Navigation("Patron");
                 });
@@ -365,6 +364,11 @@ namespace LoncotesLibrary.Migrations
                 });
 
             modelBuilder.Entity("LoncotesLibrary.Models.Material", b =>
+                {
+                    b.Navigation("Checkouts");
+                });
+
+            modelBuilder.Entity("LoncotesLibrary.Models.Patron", b =>
                 {
                     b.Navigation("Checkouts");
                 });

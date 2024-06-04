@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LoncotesLibrary.Migrations
 {
     [DbContext(typeof(LoncotesLibraryDbContext))]
-    [Migration("20240603174052_AddCheckouts")]
-    partial class AddCheckouts
+    [Migration("20240603210859_FreshStart")]
+    partial class FreshStart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -306,7 +306,7 @@ namespace LoncotesLibrary.Migrations
                             Address = "111 Broadway",
                             Email = "charlie@kelly.com",
                             FirstName = "Charlie",
-                            IsActive = true,
+                            IsActive = false,
                             LastName = "Kelly"
                         },
                         new
@@ -315,7 +315,7 @@ namespace LoncotesLibrary.Migrations
                             Address = "222 Broadway",
                             Email = "frank@reynolds.com",
                             FirstName = "Frank",
-                            IsActive = true,
+                            IsActive = false,
                             LastName = "Reynolds"
                         },
                         new
@@ -331,19 +331,19 @@ namespace LoncotesLibrary.Migrations
 
             modelBuilder.Entity("LoncotesLibrary.Models.Checkout", b =>
                 {
-                    b.HasOne("LoncotesLibrary.Models.Material", "MaterialType")
+                    b.HasOne("LoncotesLibrary.Models.Material", "Material")
                         .WithMany("Checkouts")
                         .HasForeignKey("MaterialId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LoncotesLibrary.Models.Patron", "Patron")
-                        .WithMany()
+                        .WithMany("Checkouts")
                         .HasForeignKey("PatronId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("MaterialType");
+                    b.Navigation("Material");
 
                     b.Navigation("Patron");
                 });
@@ -368,6 +368,11 @@ namespace LoncotesLibrary.Migrations
                 });
 
             modelBuilder.Entity("LoncotesLibrary.Models.Material", b =>
+                {
+                    b.Navigation("Checkouts");
+                });
+
+            modelBuilder.Entity("LoncotesLibrary.Models.Patron", b =>
                 {
                     b.Navigation("Checkouts");
                 });

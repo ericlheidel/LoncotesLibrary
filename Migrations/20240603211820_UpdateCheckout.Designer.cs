@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LoncotesLibrary.Migrations
 {
     [DbContext(typeof(LoncotesLibraryDbContext))]
-    [Migration("20240602202734_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240603211820_UpdateCheckout")]
+    partial class UpdateCheckout
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,6 +51,31 @@ namespace LoncotesLibrary.Migrations
                     b.HasIndex("PatronId");
 
                     b.ToTable("Checkouts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CheckoutDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MaterialId = 4,
+                            PatronId = 1,
+                            ReturnDate = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CheckoutDate = new DateTime(2024, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MaterialId = 5,
+                            PatronId = 2,
+                            ReturnDate = new DateTime(2024, 2, 28, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CheckoutDate = new DateTime(2024, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MaterialId = 6,
+                            PatronId = 1
+                        });
                 });
 
             modelBuilder.Entity("LoncotesLibrary.Models.Genre", b =>
@@ -120,6 +145,8 @@ namespace LoncotesLibrary.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GenreId");
+
                     b.HasIndex("MaterialTypeId");
 
                     b.ToTable("Materials");
@@ -130,14 +157,16 @@ namespace LoncotesLibrary.Migrations
                             Id = 1,
                             GenreId = 1,
                             MaterialName = "The Shining",
-                            MaterialTypeId = 1
+                            MaterialTypeId = 1,
+                            OutOfCirculation = new DateTime(1976, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 2,
                             GenreId = 2,
                             MaterialName = "1984",
-                            MaterialTypeId = 1
+                            MaterialTypeId = 1,
+                            OutOfCirculation = new DateTime(1984, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -179,7 +208,8 @@ namespace LoncotesLibrary.Migrations
                             Id = 8,
                             GenreId = 1,
                             MaterialName = "Frankenstein",
-                            MaterialTypeId = 1
+                            MaterialTypeId = 1,
+                            OutOfCirculation = new DateTime(1933, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -275,7 +305,7 @@ namespace LoncotesLibrary.Migrations
                             Address = "111 Broadway",
                             Email = "charlie@kelly.com",
                             FirstName = "Charlie",
-                            IsActive = true,
+                            IsActive = false,
                             LastName = "Kelly"
                         },
                         new
@@ -284,7 +314,7 @@ namespace LoncotesLibrary.Migrations
                             Address = "222 Broadway",
                             Email = "frank@reynolds.com",
                             FirstName = "Frank",
-                            IsActive = true,
+                            IsActive = false,
                             LastName = "Reynolds"
                         },
                         new
@@ -300,32 +330,50 @@ namespace LoncotesLibrary.Migrations
 
             modelBuilder.Entity("LoncotesLibrary.Models.Checkout", b =>
                 {
-                    b.HasOne("LoncotesLibrary.Models.Material", "MaterialType")
-                        .WithMany()
+                    b.HasOne("LoncotesLibrary.Models.Material", "Material")
+                        .WithMany("Checkouts")
                         .HasForeignKey("MaterialId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LoncotesLibrary.Models.Patron", "Patron")
-                        .WithMany()
+                        .WithMany("Checkouts")
                         .HasForeignKey("PatronId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("MaterialType");
+                    b.Navigation("Material");
 
                     b.Navigation("Patron");
                 });
 
             modelBuilder.Entity("LoncotesLibrary.Models.Material", b =>
                 {
+                    b.HasOne("LoncotesLibrary.Models.Genre", "Genre")
+                        .WithMany()
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("LoncotesLibrary.Models.MaterialType", "MaterialType")
                         .WithMany()
                         .HasForeignKey("MaterialTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Genre");
+
                     b.Navigation("MaterialType");
+                });
+
+            modelBuilder.Entity("LoncotesLibrary.Models.Material", b =>
+                {
+                    b.Navigation("Checkouts");
+                });
+
+            modelBuilder.Entity("LoncotesLibrary.Models.Patron", b =>
+                {
+                    b.Navigation("Checkouts");
                 });
 #pragma warning restore 612, 618
         }

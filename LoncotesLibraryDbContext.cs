@@ -23,7 +23,7 @@ public class LoncotesLibraryDbContext : DbContext
                 MaterialId = 4,
                 PatronId = 1,
                 CheckoutDate = new DateTime(2024,01,01),
-                ReturnDate = new DateTime(2024,01,31)
+                ReturnDate = new DateTime(2024,01,05)
             },
             new Checkout
             {
@@ -39,7 +39,7 @@ public class LoncotesLibraryDbContext : DbContext
                 MaterialId = 6,
                 PatronId = 1,
                 CheckoutDate = new DateTime(2024,03,03),
-                ReturnDate = new DateTime(2024,06,30)
+                ReturnDate = null
             },
         });
         modelBuilder.Entity<Genre>().HasData(new Genre[]
@@ -59,7 +59,7 @@ public class LoncotesLibraryDbContext : DbContext
                 LastName = "Kelly",
                 Address = "111 Broadway",
                 Email = "charlie@kelly.com",
-                IsActive = true
+                IsActive = false
             },
             new Patron
             {
@@ -68,7 +68,7 @@ public class LoncotesLibraryDbContext : DbContext
                 LastName = "Reynolds",
                 Address = "222 Broadway",
                 Email = "frank@reynolds.com",
-                IsActive = true
+                IsActive = false
             },
             new Patron
             {

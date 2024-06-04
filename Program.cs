@@ -201,11 +201,82 @@ app.MapGet("/patrons/{id}", (LoncotesLibraryDbContext db, int id) =>
                 .Single();
 });
 
+app.MapGet("/materials/available", (LoncotesLibraryDbContext db) =>
+{
+    return db.Materials
+    .Where(m => m.OutOfCirculation == null)
+    .Where(m => m.Checkouts.All(co => co.ReturnDate != null))
+    .Select(material => new MaterialDTO
+    {
+        Id = material.Id,
+        MaterialName = material.MaterialName,
+        MaterialTypeId = material.MaterialTypeId,
+        GenreId = material.GenreId,
+        OutOfCirculation = material.OutOfCirculation
+    })
+    .ToList();
+});
+
+app.MapGet("/checkouts/overdue", (LoncotesLibraryDbContext db) =>
+{
+    return db.Checkouts
+    .Include(p => p.Patron)
+    .Include(co => co.Material)
+        .ThenInclude(m => m.MaterialType)
+    .Where(co =>
+        (DateTime.Today - co.CheckoutDate).Days >
+        co.Material.MaterialType.CheckOutDays &&
+        co.ReturnDate == null)
+        .Select(co => new CheckoutDTO
+        {
+            Id = co.Id,
+            MaterialId = co.MaterialId,
+            Material = new MaterialDTO
+            {
+                Id = co.Material.Id,
+                MaterialName = co.Material.MaterialName,
+                MaterialTypeId = co.Material.MaterialTypeId,
+                MaterialType = new MaterialTypeDTO
+                {
+                    Id = co.Material.MaterialTypeId,
+                    Name = co.Material.MaterialType.Name,
+                    CheckOutDays = co.Material.MaterialType.CheckOutDays
+                },
+                GenreId = co.Material.GenreId,
+                OutOfCirculation = co.Material.OutOfCirculation
+            },
+            PatronId = co.PatronId,
+            Patron = new PatronDTO
+            {
+                Id = co.Patron.Id,
+                FirstName = co.Patron.FirstName,
+                LastName = co.Patron.LastName,
+                Address = co.Patron.Address,
+                Email = co.Patron.Email,
+                IsActive = co.Patron.IsActive
+            },
+            CheckoutDate = co.CheckoutDate,
+            ReturnDate = co.ReturnDate
+        })
+    .ToList();
+});
+
 app.MapPost("/materials", (LoncotesLibraryDbContext db, Material material) =>
 {
     db.Materials.Add(material);
     db.SaveChanges();
     return Results.Created($"/materials/{material.Id}", material);
+});
+
+app.MapPost("/checkouts", (LoncotesLibraryDbContext db, Checkout c) =>
+{
+    c.CheckoutDate = DateTime.Now;
+    c.ReturnDate = null;
+
+    db.Checkouts.Add(c);
+    db.SaveChanges();
+
+    return Results.NoContent();
 });
 
 app.MapPut("/materials/{id}", (LoncotesLibraryDbContext db, int id, Material m) =>
@@ -217,6 +288,55 @@ app.MapPut("/materials/{id}", (LoncotesLibraryDbContext db, int id, Material m) 
     }
 
     materialToUpdate.OutOfCirculation = DateTime.Now;
+
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+
+app.MapPut("/patrons/{id}", (LoncotesLibraryDbContext db, int id, Patron p) =>
+{
+    Patron patronToUpdate = db.Patrons.SingleOrDefault(p => p.Id == id);
+
+    if (patronToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+
+    patronToUpdate.Address = p.Address;
+    patronToUpdate.Email = p.Email;
+
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+
+app.MapPut("/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id, Patron p) =>
+{
+    Patron patronToDeactivate = db.Patrons.SingleOrDefault(p => p.Id == id);
+
+    if (patronToDeactivate == null)
+    {
+        return Results.NotFound();
+    }
+
+    patronToDeactivate.IsActive = true;
+
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+
+app.MapPost("/checkouts/materialId={materialId}/return", (LoncotesLibraryDbContext db, int materialId) =>
+{
+    Checkout checkoutToReturn = db.Checkouts.SingleOrDefault(c => c.MaterialId == materialId);
+
+    if (checkoutToReturn == null)
+    {
+        return Results.NotFound();
+    }
+
+    checkoutToReturn.ReturnDate = DateTime.Now;
 
     db.SaveChanges();
 

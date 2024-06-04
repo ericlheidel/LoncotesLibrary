@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LoncotesLibrary.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class FreshStart : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -73,6 +73,12 @@ namespace LoncotesLibrary.Migrations
                 {
                     table.PrimaryKey("PK_Materials", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Materials_Genres_GenreId",
+                        column: x => x.GenreId,
+                        principalTable: "Genres",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Materials_MaterialTypes_MaterialTypeId",
                         column: x => x.MaterialTypeId,
                         principalTable: "MaterialTypes",
@@ -135,8 +141,8 @@ namespace LoncotesLibrary.Migrations
                 columns: new[] { "Id", "Address", "Email", "FirstName", "IsActive", "LastName" },
                 values: new object[,]
                 {
-                    { 1, "111 Broadway", "charlie@kelly.com", "Charlie", true, "Kelly" },
-                    { 2, "222 Broadway", "frank@reynolds.com", "Frank", true, "Reynolds" },
+                    { 1, "111 Broadway", "charlie@kelly.com", "Charlie", false, "Kelly" },
+                    { 2, "222 Broadway", "frank@reynolds.com", "Frank", false, "Reynolds" },
                     { 3, "333 Broadway", "mac@mcdonald.com", "Mac", false, "McDonald" }
                 });
 
@@ -145,16 +151,26 @@ namespace LoncotesLibrary.Migrations
                 columns: new[] { "Id", "GenreId", "MaterialName", "MaterialTypeId", "OutOfCirculation" },
                 values: new object[,]
                 {
-                    { 1, 1, "The Shining", 1, null },
-                    { 2, 2, "1984", 1, null },
+                    { 1, 1, "The Shining", 1, new DateTime(1976, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 2, "1984", 1, new DateTime(1984, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 3, 3, "The Hitchhiker's Guide to the Galaxy", 1, null },
                     { 4, 4, "National Geographic", 2, null },
                     { 5, 5, "Scientific American", 2, null },
                     { 6, 4, "The New York Times", 3, null },
                     { 7, 3, "The Onion", 3, null },
-                    { 8, 1, "Frankenstein", 1, null },
+                    { 8, 1, "Frankenstein", 1, new DateTime(1933, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 9, 2, "To Kill a Mockingbird", 1, null },
                     { 10, 4, "Time Magazine", 2, null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Checkouts",
+                columns: new[] { "Id", "CheckoutDate", "MaterialId", "PatronId", "ReturnDate" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, 1, new DateTime(2024, 1, 31, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, new DateTime(2024, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, 2, new DateTime(2024, 2, 28, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, new DateTime(2024, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), 6, 1, new DateTime(2024, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -166,6 +182,11 @@ namespace LoncotesLibrary.Migrations
                 name: "IX_Checkouts_PatronId",
                 table: "Checkouts",
                 column: "PatronId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Materials_GenreId",
+                table: "Materials",
+                column: "GenreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Materials_MaterialTypeId",
@@ -180,13 +201,13 @@ namespace LoncotesLibrary.Migrations
                 name: "Checkouts");
 
             migrationBuilder.DropTable(
-                name: "Genres");
-
-            migrationBuilder.DropTable(
                 name: "Materials");
 
             migrationBuilder.DropTable(
                 name: "Patrons");
+
+            migrationBuilder.DropTable(
+                name: "Genres");
 
             migrationBuilder.DropTable(
                 name: "MaterialTypes");
